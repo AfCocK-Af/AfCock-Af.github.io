@@ -2,8 +2,8 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mountain View</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>AfCocK的个人网站</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style type="text/tailwindcss">
         @layer utilities {
@@ -13,56 +13,367 @@
         }
     </style>
     <style>
-        body {
+        * {
             margin: 0;
             padding: 0;
+            box-sizing: border-box;
+        }
+        body {
             font-family: Arial, sans-serif;
+            --bg-color: #000000;
+            --text-color: #ffffff;
+            transition: background-color 0.3s ease, color 0.3s ease;
+            overflow: hidden; /* 彻底禁止滚动，无滚动条 */
         }
         .container {
-            display: flex;
-            flex-direction: column;
-            height: 100vh;
-        }
-        .image-section {
-            flex: 1;
-            background-image: url('https://p26-flow-imagex-download-sign.byteimg.com/tos-cn-i-a9rns2rl98/057b3b2d85504828a1c1035f79d5ca25.png~tplv-a9rns2rl98-24:720:720.png?rcl=20251226205359A21B61CBBA8B6A8BF477&rk3s=8e244e95&rrcfp=8a172a1a&x-expires=1767358440&x-signature=d1EwureE0FnxIo%2FCqgNq1nbhqYA%3D');
-            background-size: cover;
-            background-position: center;
-            background-repeat: no-repeat;
+            width: 100vw; /* 视口宽度100% */
+            height: 100vh; /* 视口高度100% */
             position: relative;
         }
+        /* 图片区域完全占满整个屏幕 */
+        .image-section {
+            width: 100vw;
+            height: 100vh;
+            background-size: cover; /* 保留比例填满屏幕 */
+            background-position: center; /* 居中显示 */
+            background-repeat: no-repeat;
+            position: relative;
+            cursor: pointer;
+            transition: background-image 0.5s ease-in-out, opacity 0.3s ease-in-out;
+            opacity: 1;
+        }
+        /* 渐变层：高度从200px（等效30%）改为对应50%视觉高度，调整为固定值或百分比 */
         .gradient-section {
             position: absolute;
             bottom: 0;
             left: 0;
-            width: 100%;
-            height: 200px;
-            background: linear-gradient(to top, rgba(0,0,0,1), rgba(0,0,0,0));
+            width: 100vw;
+            height: 50vh; /* 直接设为视口高度50%，实现渐变层占50%屏幕高度 */
+            background: linear-gradient(to top, var(--bg-color), rgba(0,0,0,0));
             display: flex;
             justify-content: center;
             align-items: center;
         }
         .text-overlay {
-            position: absolute;
-            color: white;
+            color: var(--text-color);
             font-size: 4rem;
             font-weight: bold;
             text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
         }
-        .black-section {
-            height: 200px;
-            background-color: black;
+        /* 设置按钮：移到右下角（右下定位） */
+        .settings-btn {
+            position: fixed;
+            bottom: 20px; /* 距离底部20px */
+            right: 20px; /* 距离右侧20px */
+            padding: 12px 24px;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            border: 2px solid var(--text-color);
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1rem;
+            z-index: 100;
+            transition: all 0.3s ease;
+        }
+        /* 新增：左下「模块」按钮（跳转功能） */
+        .module-btn {
+            position: fixed;
+            bottom: 20px; /* 与设置按钮同底部间距，保持对齐 */
+            left: 20px; /* 距离左侧20px */
+            padding: 12px 24px;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            border: 2px solid var(--text-color);
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1rem;
+            z-index: 100;
+            transition: all 0.3s ease;
+            text-decoration: none; /* 去除链接下划线（若用a标签） */
+        }
+        /* 按钮悬浮效果（统一设置和模块按钮） */
+        .settings-btn:hover, .module-btn:hover {
+            background-color: var(--text-color);
+            color: var(--bg-color);
+        }
+        /* 设置面板样式 */
+        .settings-panel {
+            position: fixed;
+            top: 0;
+            right: 0;
+            width: 300px;
+            height: 100vh;
+            background-color: var(--bg-color);
+            border-left: 2px solid var(--text-color);
+            padding: 80px 20px 20px;
+            transform: translateX(100%);
+            transition: transform 0.3s ease;
+            z-index: 99;
+            box-sizing: border-box;
+        }
+        .settings-panel.active {
+            transform: translateX(0);
+        }
+        .setting-item {
+            margin-bottom: 30px;
+        }
+        .setting-title {
+            color: var(--text-color);
+            font-size: 1.2rem;
+            margin-bottom: 15px;
+            border-bottom: 1px solid var(--text-color);
+            padding-bottom: 8px;
+        }
+        .option-item {
+            color: var(--text-color);
+            font-size: 1rem;
+            padding: 8px 0;
+            cursor: pointer;
+            border-radius: 4px;
+            padding-left: 10px;
+            margin-bottom: 5px;
+            transition: background-color 0.2s ease;
+        }
+        .option-item:hover {
+            background-color: rgba(255,255,255,0.1);
+        }
+        .option-item.active {
+            background-color: var(--text-color);
+            color: var(--bg-color);
+        }
+
+        /* 移动端适配 */
+        @media (max-width: 768px) {
+            .text-overlay {
+                font-size: 2.5rem;
+            }
+            .settings-panel {
+                width: 250px;
+            }
+            .gradient-section {
+                height: 50vh; /* 移动端也保持50%高度，同步适配 */
+            }
+            .settings-btn, .module-btn {
+                font-size: 0.9rem;
+                padding: 10px 20px;
+            }
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <div class="image-section">
+        <!-- 设置按钮：移至右下 -->
+        <button class="settings-btn" id="settings-btn">设置</button>
+        
+        <!-- 新增：左下「模块」按钮（支持跳转，两种实现方式可选） -->
+        <!-- 方式1：button标签 + JS跳转（推荐，样式统一） -->
+        <button class="module-btn" id="module-btn">模块</button>
+        <!-- 方式2：a标签 + 直接跳转（无需JS，href替换为目标页面） -->
+        <!-- <a href="https://www.example.com" target="_blank" class="module-btn">模块</a> -->
+        
+        <!-- 设置面板：保留自动轮播开关 -->
+        <div class="settings-panel" id="settings-panel">
+            <div class="setting-item">
+                <div class="setting-title">图组选择</div>
+                <div class="option-item image-group" data-group="kunshan" id="group-kunshan">坤山</div>
+                <div class="option-item image-group" data-group="view1" id="group-view1">view1</div>
+                <div class="option-item image-group" data-group="all" id="group-all">全部</div>
+            </div>
+            <div class="setting-item">
+                <div class="setting-title">界面颜色</div>
+                <div class="option-item color-option" data-color="black" id="color-black">黑色</div>
+                <div class="option-item color-option" data-color="white" id="color-white">白色</div>
+            </div>
+            <div class="setting-item">
+                <div class="setting-title">自动轮播</div>
+                <div class="option-item autoplay-option" data-autoplay="on" id="autoplay-on">开启</div>
+                <div class="option-item autoplay-option" data-autoplay="off" id="autoplay-off">关闭</div>
+            </div>
+        </div>
+        
+        <!-- 图片区域（完全全屏） -->
+        <div class="image-section" id="image-section">
             <div class="gradient-section">
                 <div class="text-overlay">AfCocK</div>
             </div>
         </div>
-        <div class="black-section"></div>
     </div>
+
+    <script>
+        // 1. 图片数据定义（分图组）
+        const kunshanImages = [
+            "https://p26-flow-imagex-download-sign.byteimg.com/tos-cn-i-a9rns2rl98/057b3b2d85504828a1c1035f79d5ca25.png~tplv-a9rns2rl98-24:720:720.png?rcl=20251226205359A21B61CBBA8B6A8BF477&rk3s=8e244e95&rrcfp=8a172a1a&x-expires=1767358440&x-signature=d1EwureE0FnxIo%2FCqgNq1nbhqYA%3D"
+        ];
+        const view1Images = [
+            "https://p3-flow-imagex-download-sign.byteimg.com/tos-cn-i-a9rns2rl98/1fa0832dd690489b96d5c4c30612a961.jpg~tplv-a9rns2rl98-24:720:720.image?rcl=20251227123627F9A62DA5BFC9314A04C8&rk3s=8e244e95&rrcfp=8a172a1a&x-expires=1767414987&x-signature=TzD%2Fp%2FKLbLX9SaiNYGbqinrwWFU%3D",
+            "https://p3-flow-imagex-download-sign.byteimg.com/tos-cn-i-a9rns2rl98/3307cb85a10a44d8ac38186cf6bfdb28.jpg~tplv-a9rns2rl98-24:720:720.image?rcl=20251227123627F9A62DA5BFC9314A04C8&rk3s=8e244e95&rrcfp=8a172a1a&x-expires=1767414987&x-signature=Wj8uhRk5Mz1VC0wLpF0ZNUVR1vQ%3D",
+            "https://p3-flow-imagex-download-sign.byteimg.com/tos-cn-i-a9rns2rl98/d5200d288caa4ff48d749f584375fcf6.jpg~tplv-a9rns2rl98-24:720:720.image?rcl=20251227123627F9A62DA5BFC9314A04C8&rk3s=8e244e95&rrcfp=8a172a1a&x-expires=1767414987&x-signature=53Npc8XNihnIOQAkubVMsfGUvD0%3D",
+            "https://p3-flow-imagex-download-sign.byteimg.com/tos-cn-i-a9rns2rl98/aaa80ff125674f56bb59b8d03fddfbd7.jpg~tplv-a9rns2rl98-24:720:720.image?rcl=20251227123627F9A62DA5BFC9314A04C8&rk3s=8e244e95&rrcfp=8a172a1a&x-expires=1767414987&x-signature=9N%2ByMMCs8beIGvTczsu1m08ecN8%3D",
+            "https://p3-flow-imagex-download-sign.byteimg.com/tos-cn-i-a9rns2rl98/366c0817d9e148409905543db595823b.jpg~tplv-a9rns2rl98-24:720:720.image?rcl=20251227123627F9A62DA5BFC9314A04C8&rk3s=8e244e95&rrcfp=8a172a1a&x-expires=1767414987&x-signature=i2Ny%2B5v9k%2FfgE%2Fhq3Q2JYN2V%2BYc%3D",
+            "https://p3-flow-imagex-download-sign.byteimg.com/tos-cn-i-a9rns2rl98/478a6b3e4fd44faa888784fde61dc37f.jpg~tplv-a9rns2rl98-24:720:720.image?rcl=20251227123627F9A62DA5BFC9314A04C8&rk3s=8e244e95&rrcfp=8a172a1a&x-expires=1767414987&x-signature=gp%2FrNlDHxUXqLC10kO4Bi1zIbV0%3D",
+            "https://p3-flow-imagex-download-sign.byteimg.com/tos-cn-i-a9rns2rl98/377715641e294f0aa0e562702343a020.jpg~tplv-a9rns2rl98-24:720:720.image?rcl=20251227123627F9A62DA5BFC9314A04C8&rk3s=8e244e95&rrcfp=8a172a1a&x-expires=1767414987&x-signature=AvpF3HaPExKzYyBixQlrPdUFrbE%3D"
+        ];
+        const allImages = [...kunshanImages, ...view1Images];
+
+        // 2. 全局状态变量
+        let currentImageIndex = 0;
+        let currentImageGroup = "kunshan";
+        let currentColorMode = "black";
+        let currentImageList = kunshanImages;
+        let autoplayStatus = "off";
+        let autoPlayInterval = null;
+
+        // 3. DOM元素获取（新增模块按钮）
+        const imageSection = document.getElementById('image-section');
+        const settingsBtn = document.getElementById('settings-btn');
+        const settingsPanel = document.getElementById('settings-panel');
+        const moduleBtn = document.getElementById('module-btn'); // 新增
+        const imageGroupOptions = document.querySelectorAll('.image-group');
+        const colorOptions = document.querySelectorAll('.color-option');
+        const autoplayOptions = document.querySelectorAll('.autoplay-option');
+
+        // 4. 图片加载兜底函数
+        function setImageWithFallback(url) {
+            const img = new Image();
+            img.src = url;
+            img.onload = () => {
+                imageSection.style.backgroundImage = `url('${url}')`;
+            };
+            img.onerror = () => {
+                imageSection.style.backgroundImage = `url('https://picsum.photos/1920/1080')`;
+            };
+        }
+
+        // 5. 初始化
+        setImageWithFallback(currentImageList[currentImageIndex]);
+        document.getElementById('group-kunshan').classList.add('active');
+        document.getElementById('color-black').classList.add('active');
+        document.getElementById('autoplay-off').classList.add('active');
+
+        // 窗口大小变化适配
+        window.addEventListener('resize', () => {
+            setImageWithFallback(currentImageList[currentImageIndex]);
+        });
+
+        // 6. 控制自动轮播核心函数
+        function controlAutoplay() {
+            if (autoPlayInterval) {
+                clearInterval(autoPlayInterval);
+                autoPlayInterval = null;
+            }
+            if (autoplayStatus === "on") {
+                autoPlayInterval = setInterval(switchImage, 5000);
+            }
+        }
+
+        // 7. 图片切换函数
+        function switchImage() {
+            imageSection.style.opacity = '0';
+            setTimeout(() => {
+                currentImageIndex = (currentImageIndex + 1) % currentImageList.length;
+                setImageWithFallback(currentImageList[currentImageIndex]);
+                imageSection.style.opacity = '1';
+            }, 300);
+        }
+
+        // 8. 点击图片手动切换
+        imageSection.addEventListener('click', () => {
+            switchImage();
+            if (autoplayStatus === "on") {
+                controlAutoplay();
+            }
+        });
+
+        // 9. 设置面板切换
+        settingsBtn.addEventListener('click', () => {
+            settingsPanel.classList.toggle('active');
+        });
+
+        // 10. 新增：模块按钮跳转逻辑（替换为你的目标页面URL）
+        moduleBtn.addEventListener('click', () => {
+            // 方式1：在当前窗口打开（替换URL为你的目标页面）
+            window.location.href = "https://www.example.com";
+            // 方式2：在新窗口打开（保留原页面）
+            // window.open("https://www.example.com", "_blank");
+        });
+
+        // 11. 点击外部关闭设置面板
+        document.addEventListener('click', (e) => {
+            const isClickOnBtn = settingsBtn.contains(e.target);
+            const isClickOnPanel = settingsPanel.contains(e.target);
+            const isClickOnModuleBtn = moduleBtn.contains(e.target); // 排除模块按钮点击
+            if (!isClickOnBtn && !isClickOnPanel && !isClickOnModuleBtn) {
+                settingsPanel.classList.remove('active');
+            }
+        });
+
+        // 12. 图组选择
+        imageGroupOptions.forEach(option => {
+            option.addEventListener('click', () => {
+                imageGroupOptions.forEach(item => item.classList.remove('active'));
+                option.classList.add('active');
+                currentImageGroup = option.dataset.group;
+                
+                switch (currentImageGroup) {
+                    case 'kunshan': 
+                        currentImageList = kunshanImages;
+                        autoplayStatus = "off";
+                        document.getElementById('autoplay-off').classList.add('active');
+                        document.getElementById('autoplay-on').classList.remove('active');
+                        break;
+                    case 'view1': 
+                        currentImageList = view1Images;
+                        autoplayStatus = "on";
+                        document.getElementById('autoplay-on').classList.add('active');
+                        document.getElementById('autoplay-off').classList.remove('active');
+                        break;
+                    case 'all': 
+                        currentImageList = allImages;
+                        autoplayStatus = "on";
+                        document.getElementById('autoplay-on').classList.add('active');
+                        document.getElementById('autoplay-off').classList.remove('active');
+                        break;
+                }
+                
+                currentImageIndex = 0;
+                setImageWithFallback(currentImageList[currentImageIndex]);
+                settingsPanel.classList.remove('active');
+                controlAutoplay();
+            });
+        });
+
+        // 13. 颜色切换
+        colorOptions.forEach(option => {
+            option.addEventListener('click', () => {
+                colorOptions.forEach(item => item.classList.remove('active'));
+                option.classList.add('active');
+                currentColorMode = option.dataset.color;
+                
+                if (currentColorMode === 'black') {
+                    document.body.style.setProperty('--bg-color', '#000000');
+                    document.body.style.setProperty('--text-color', '#ffffff');
+                } else {
+                    document.body.style.setProperty('--bg-color', '#ffffff');
+                    document.body.style.setProperty('--text-color', '#000000');
+                }
+                
+                settingsPanel.classList.remove('active');
+                controlAutoplay();
+            });
+        });
+
+        // 14. 自动轮播开关控制
+        autoplayOptions.forEach(option => {
+            option.addEventListener('click', () => {
+                autoplayOptions.forEach(item => item.classList.remove('active'));
+                option.classList.add('active');
+                
+                autoplayStatus = option.dataset.autoplay;
+                controlAutoplay();
+                
+                settingsPanel.classList.remove('active');
+            });
+        });
+    </script>
 </body>
 </html>
