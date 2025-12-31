@@ -164,12 +164,7 @@
     <div class="container">
         <!-- 设置按钮：移至右下 -->
         <button class="settings-btn" id="settings-btn">设置</button>
-        
-        <!-- 新增：左下「模块」按钮（支持跳转，两种实现方式可选） -->
-        <!-- 方式1：button标签 + JS跳转（推荐，样式统一） -->
         <button class="module-btn" id="module-btn">模块</button>
-        <!-- 方式2：a标签 + 直接跳转（无需JS，href替换为目标页面） -->
-        <!-- <a href="https://www.example.com" target="_blank" class="module-btn">模块</a> -->
         
         <!-- 设置面板：保留自动轮播开关 -->
         <div class="settings-panel" id="settings-panel">
@@ -292,9 +287,9 @@
         // 10. 新增：模块按钮跳转逻辑（替换为你的目标页面URL）
         moduleBtn.addEventListener('click', () => {
             // 方式1：在当前窗口打开（替换URL为你的目标页面）
-            window.location.href = "crafting.html";
+           // window.location.href = "module.html";
             // 方式2：在新窗口打开（保留原页面）
-            // window.open("crafting.html", "_blank");
+            window.open("crafting.html", "_blank");
         });
 
         // 11. 点击外部关闭设置面板
